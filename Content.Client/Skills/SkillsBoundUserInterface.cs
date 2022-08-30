@@ -9,47 +9,23 @@ namespace Content.Client.Skills
 {
     public sealed class SkillsMenuBoundUserInterface : BoundUserInterface
     {
-        [ViewVariables] private SkillsMenu? _menu;
-        public SharedSkillsComponent? SkillHolder { get; private set; }
+        [ViewVariables] private SkillsMenuWindow? _menu;
 
-        /*
         public SkillsMenuBoundUserInterface(ClientUserInterfaceComponent owner, object uiKey) : base(owner, uiKey)
         {
-            SendMessage(new InventorySyncRequestMessage());
+            SendMessage(new SkillSyncRequestMessage());
         }
-        */
+
         protected override void Open()
         {
             base.Open();
 
-            var entMan = IoCManager.Resolve<IEntityManager>();
-            if (!entMan.TryGetComponent(Owner.Owner, out SharedSkillsComponent? skill))
-            {
-                return;
-            }
-
-            SkillHolder = skill;
-
-            _menu = new SkillMenu(this) { Title = "bbazinga" };
-            _menu.Populate(skill.AcquiredPerks);
+            _menu = new SkillsMenuWindow(this);
+            if (State != null)
+                UpdateState(State);
 
             _menu.OnClose += Close;
             _menu.OpenCentered();
-        }
-
-        public void Eject(InventoryType type, string id)
-        {
-            SendMessage(new VendingMachineEjectMessage(type, id));
-        }
-
-        protected override void ReceiveMessage(BoundUserInterfaceMessage message)
-        {
-            switch (message)
-            {
-                case VendingMachineInventoryMessage msg:
-                    _menu?.Populate(msg.Inventory);
-                    break;
-            }
         }
 
         protected override void Dispose(bool disposing)
@@ -60,6 +36,17 @@ namespace Content.Client.Skills
 
             _menu?.Dispose();
         }
+
+        protected override void UpdateState(BoundUserInterfaceState state)
+        {
+            base.UpdateState(state);
+            if (_menu == null || state is not SkillSyncDataState cast)
+                return;
+
+            _menu.Populate_PerkTab(cast.Perks);
+            _menu.Populate_SkillsTab(cast.Skills);
+        }
+
     }
 }
 

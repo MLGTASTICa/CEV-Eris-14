@@ -8,56 +8,127 @@ using System.Globalization;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
+using Content.Shared.Access.Components;
+using Content.Shared.Access.Systems;
+using Content.Shared.Actions;
+using Content.Shared.Actions.ActionTypes;
+using Content.Shared.Damage;
+using Content.Shared.Destructible;
+using Content.Shared.Emag.Systems;
+using Content.Shared.Throwing;
+using Content.Shared.VendingMachines;
+using Robust.Shared.Audio;
+using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
+using Content.Shared.Actions.ActionTypes;
+using Content.Shared.Sound;
+using Content.Shared.VendingMachines;
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
 namespace Content.Shared.Skills
 {
-    // Just as a notice , a byte can only have 8 flags, so if further skills get added , it should get changed to a short 
-    [Flags]
-    public enum Skills : byte
-    {
-        Robustness = 0,
-        Toughness = 1<<0,
-        Vigilance = 1<<1,
-        Mechanical = 1<<2,
-        Cognition = 1<<3,
-        Biology = 1<<4,
-    }
-
-    [Flags]
-    public enum Perks : short
-    {
-        BallsOfPlasteel = 0,
-
-    }
     [Prototype("perk")]
     public sealed class PerkDataPrototype : IPrototype
     {
-        string IPrototype.ID => AssociatedPerk.ToString();
-        [DataField("perk")]
-        public Perks AssociatedPerk = Perks.BallsOfPlasteel;
+        [ViewVariables]
+        [IdDataField]
+        public string ID { get; } = default!;
+
+        [DataField("name")]
+        public string Name = "Debug perk";
 
         [DataField("description")]
-        public string Description = "You are far more tougher to pain compared to other spacemen.";
+        public string Description = "You can now commit numerous exploits!";
 
         [DataField("icon")]
-        public SpriteSpecifier Icon = new SpriteSpecifier.Texture(new ResourcePath("Textures/noSprite.png"));
+        public SpriteSpecifier.Texture Icon = new SpriteSpecifier.Texture(new ResourcePath("Textures/noSprite.png"));
     }
 
+    [Prototype("skill")]
+
+    public sealed class SkillPrototype : IPrototype
+    {
+        [ViewVariables]
+        [IdDataField]
+        public string ID { get; } = default!;
+
+        [DataField("name")]
+        public string Name = "NoSkill?";
+
+        [DataField("max")]
+        public ushort MaxValue = 999;
+
+        [DataField("min")]
+        public short MinValue = -999;
+
+        // does this skill show by default in the skills tab?
+        [DataField("publicSkill")]
+        public bool PublicSkill = false;
+
+    }
+
+    [NetSerializable, Serializable]
+
+    public sealed class PerkHolder
+    {
+        public readonly string Name;
+        public readonly string Description;
+        public readonly SpriteSpecifier.Texture Icon;
+
+        public PerkHolder(string name, string description, SpriteSpecifier.Texture icon)
+        {
+            Name = name;
+            Description = description;
+            Icon = icon;
+        }
+    }
+
+    [NetSerializable, Serializable]
+    public sealed class SkillHolder
+    {
+        [ViewVariables(VVAccess.ReadOnly)] public readonly string Name;
+        [ViewVariables(VVAccess.ReadWrite)] public short Value;
+        public SkillHolder(string name, short value)
+        {
+            Name = name;
+            Value = value;
+        }
+    }
 
     [NetworkedComponent()]
     public abstract class SharedSkillsComponent : Component
     {
-        public List<Perks> AcquiredPerks = new List<Perks>();
+        [ViewVariables(VVAccess.ReadOnly)]
+        public List<PerkHolder> PerkIdentifiers = new();
 
-        public Dictionary<Skills, int> SkillValues = new()
+        [ViewVariables(VVAccess.ReadOnly)]
+        public List<SkillHolder> UserSkills = new();
+
+    }
+
+
+    [Serializable, NetSerializable]
+    public sealed class SkillSyncRequestMessage : BoundUserInterfaceMessage
+    {
+    }
+
+    [Serializable, NetSerializable]
+    public enum SkillMenuUiKey
+    {
+        Key,
+    }
+
+    [Serializable, NetSerializable]
+    public sealed class SkillSyncDataState : BoundUserInterfaceState
+    {
+        public readonly List<PerkHolder> Perks;
+
+        public readonly List<SkillHolder> Skills;
+        public SkillSyncDataState(List<PerkHolder> perks, List<SkillHolder> skills)
         {
-            { Skills.Robustness, 0},
-            { Skills.Toughness, 0 },
-            { Skills.Vigilance, 0},
-            { Skills.Mechanical, 0},
-            { Skills.Cognition, 0},
-            { Skills.Biology, 0},
-
-        };
+            Perks = perks;
+            Skills = skills;
+        }
     }
 }

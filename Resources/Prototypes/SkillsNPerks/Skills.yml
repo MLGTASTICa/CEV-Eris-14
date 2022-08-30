@@ -1,0 +1,41 @@
+- type: skill
+  id: skillRobustness
+  name: Robustness
+  max: 120
+  min: -30
+  publicSkill: true
+
+- type: skill
+  id: skillToughness
+  name: Toughness
+  max: 200
+  min: -100
+  publicSkill: true
+
+- type: skill
+  id: skillVigilance
+  name: Vigilance
+  max: 200
+  min: -50
+  publicSkill: true
+
+- type: skill
+  id: skillBiology
+  name: Biology
+  max: 200
+  min: -50
+  publicSkill: true
+
+- type: skill
+  id: skillMechanical
+  name: Mechanical
+  max: 400
+  min: -200
+  publicSkill: true
+
+- type: skill
+  id: skillCognition
+  name: Cognition
+  max: 500
+  min: -200
+  publicSkill: true

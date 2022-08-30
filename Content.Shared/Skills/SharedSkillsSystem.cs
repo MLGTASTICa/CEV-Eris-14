@@ -1,38 +1,37 @@
+/*
 using Robust.Shared.Prototypes;
+using Robust.Shared.Log;
+using Robust.Shared.GameStates;
+using System.Diagnostics.CodeAnalysis;
+using Robust.Shared.Map;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Timing;
 
 namespace Content.Shared.Skills
 {
     public abstract class SharedSkillsSystem : EntitySystem
     {
-        [Dependency] private readonly PrototypeManager _prototypes = default!;
-
-        private readonly Dictionary<Perks, PerkDataPrototype> _perkToPrototype = new();
-
         public override void Initialize()
         {
             base.Initialize();
+            SubscribeLocalEvent<ComponentInit, SharedSkillsComponent>(OnComponentInit);
 
-            LoadPrototypes();
-            _prototypes.PrototypesReloaded += HandlePrototypesReloaded;
+
         }
-
-        private void HandlePrototypesReloaded(PrototypesReloadedEventArgs obj)
+        private void OnComponentInit(EntityUid uid, SharedSkillsComponent component, ComponentInit args)
         {
-            LoadPrototypes();
-        }
-
-        protected private void LoadPrototypes()
-        {
-            _perkToPrototype.Clear();
-            foreach (var perk in _prototypes.EnumeratePrototypes<PerkDataPrototype>())
+            base.Initialize();
+            component.UserSkills.Clear();
+            component.PerkIdentifiers.Clear();
+            foreach (string skillIdentifier in _publicSkills)
             {
-                if (!_perkToPrototype.TryAdd(perk.AssociatedPerk, perk))
-                {
-                    Logger.ErrorS("skills",
-                        "Found perk with duplicate PerkDataPrototype {0} - all perks must have" +
-                        " a unique prototype, this one will be skipped", perk.AssociatedPerk);
-                }
+                SkillHolder skillData = new(skillIdentifier, 0);
+                component.UserSkills.Add(skillData);
             }
+
+
         }
+
     }
 }
+*/

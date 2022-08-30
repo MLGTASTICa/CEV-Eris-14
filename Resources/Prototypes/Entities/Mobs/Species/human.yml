@@ -302,6 +302,8 @@
     interfaces:
     - key: enum.StrippingUiKey.Key
       type: StrippableBoundUserInterface
+    - key: enum.SkillMenuUiKey.Key
+      type: SkillsMenuBoundUserInterface
   - type: Puller
   - type: Butcherable
     butcheringType: Spike # TODO human.
