@@ -16,7 +16,6 @@
     <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Content.Server.Database\Content.Server.Database.csproj" />
     <ProjectReference Include="..\Content.Shared.Database\Content.Shared.Database.csproj" />
     <ProjectReference Include="..\RobustToolbox\Lidgren.Network\Lidgren.Network.csproj">
       <Private>false</Private>
